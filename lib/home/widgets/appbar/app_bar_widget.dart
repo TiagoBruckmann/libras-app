@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:libras/core/app_gradients.dart';
 import 'package:libras/core/app_text_styles.dart';
 import 'package:libras/home/widgets/score_card/score_card_widget.dart';
-import 'package:libras/shared/models/user_model.dart';
 
 class AppBarWidget extends PreferredSize {
 
-  final UserModel user;
+  final String name;
+  final String photo;
+  final double nextLevel;
 
-  AppBarWidget({ this.user })
-    : super(
+  AppBarWidget({ this.name, this.photo, this.nextLevel })
+  : super(
     preferredSize: Size.fromHeight(250),
     child: Container(
       height: 250,
@@ -29,7 +30,7 @@ class AppBarWidget extends PreferredSize {
                       style: AppTextStyles.title,
                       children: [
                         TextSpan(
-                          text: user.name,
+                          text: "$name",
                           style: AppTextStyles.titleBold,
                         ),
                       ]
@@ -41,7 +42,9 @@ class AppBarWidget extends PreferredSize {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     image: DecorationImage(
-                      image: NetworkImage(user.photoUrl),
+                      image: NetworkImage(
+                        "$photo",
+                      ),
                     ),
                   ),
                 )
@@ -50,7 +53,9 @@ class AppBarWidget extends PreferredSize {
           ),
           Align(
             alignment: Alignment(0.0, 1.0),
-            child: ScoreCardWidget(),
+            child: ScoreCardWidget(
+              nextLevel: nextLevel,
+            ),
           ),
         ],
       )

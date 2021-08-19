@@ -3,8 +3,17 @@ import 'package:libras/core/app_colors.dart';
 import 'package:libras/core/app_text_styles.dart';
 
 class ChartWidget extends StatelessWidget {
+
+  final double nextLevel;
+
+  ChartWidget({ this.nextLevel });
+
   @override
   Widget build(BuildContext context) {
+
+    String convertNextLevel = nextLevel.toString()[0];
+    double newNextLevel = double.parse(".$convertNextLevel");
+
     return Container(
       height: 80,
       width: 80,
@@ -16,10 +25,10 @@ class ChartWidget extends StatelessWidget {
               width: 80,
               child: CircularProgressIndicator(
                 strokeWidth: 10,
-                value: .75,
-                backgroundColor: AppColors.chartSecondary,
+                value: newNextLevel,
+                 backgroundColor: AppColors.chartSecondary,
                 valueColor: AlwaysStoppedAnimation<Color>(
-                    AppColors.chartPrimary
+                  AppColors.chartPrimary,
                 ),
               ),
             ),
@@ -27,10 +36,10 @@ class ChartWidget extends StatelessWidget {
 
           Center(
             child: Text(
-              "75%",
+              "$nextLevel%",
               style: AppTextStyles.heading,
             ),
-          )
+          ),
         ],
       ),
     );

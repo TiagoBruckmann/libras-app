@@ -39,7 +39,7 @@ class QuizCardWidget extends StatelessWidget {
             height: 20,
           ),
           Text(
-            title,
+            "$title",
             style: AppTextStyles.heading15,
           ),
           SizedBox(
@@ -50,7 +50,7 @@ class QuizCardWidget extends StatelessWidget {
               Expanded(
                 flex: 1,
                 child: Text(
-                  completed,
+                  "$completed",
                   style: AppTextStyles.body11,
                 ),
               ),

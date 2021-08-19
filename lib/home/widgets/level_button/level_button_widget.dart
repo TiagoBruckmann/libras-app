@@ -8,7 +8,7 @@ class LevelButtonWidget extends StatelessWidget {
   LevelButtonWidget({
     Key key,
     this.label
-  }) : assert([ "Fácil", "Médio", "Difícil", "Perito" ].contains(label)), super(key: key);
+  }) : assert([ "Fácil", "Médio", "Difícil", "Fluente" ].contains(label)), super(key: key);
 
   final config = {
     "Fácil": {
@@ -26,7 +26,7 @@ class LevelButtonWidget extends StatelessWidget {
       "borderColor": AppColors.levelButtonBorderDificil,
       "fontColor": AppColors.levelButtonTextDificil,
     },
-    "Perito": {
+    "Fluente": {
       "color": AppColors.levelButtonPerito,
       "borderColor": AppColors.levelButtonBorderPerito,
       "fontColor": AppColors.levelButtonTextPerito,

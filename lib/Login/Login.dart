@@ -199,37 +199,38 @@ class _LoginState extends State<Login> {
                 Padding(
                   padding: EdgeInsets.only(top: 16, bottom: 10),
                   child: ElevatedButton(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.login,
-                            color: Colors.white,
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(right: 5),
-                          ),
-                          Text(
-                            "Entrar",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                            ),
-                          ),
-                        ],
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        primary: AppColors.grey,
-                        padding: EdgeInsets.fromLTRB(36, 16, 36, 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.login,
+                          color: Colors.white,
                         ),
+                        Padding(
+                          padding: EdgeInsets.only(right: 5),
+                        ),
+                        Text(
+                          "Entrar",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      primary: AppColors.grey,
+                      padding: EdgeInsets.fromLTRB(36, 16, 36, 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
                       ),
-                      onPressed: () {
-                        _validateFields();
-                      }
+                    ),
+                    onPressed: () {
+                      _validateFields();
+                    },
                   ),
                 ),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -248,21 +249,6 @@ class _LoginState extends State<Login> {
                       ),
                     ),
 
-                    /*
-                    GestureDetector(
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(20, 15, 20, 10),
-                        child: Text(
-                          "Esqueceu sua senha?",
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 16
-                          )
-                        ),
-                      )
-                    ),
-                    */
                   ],
                 ),
                 Padding(

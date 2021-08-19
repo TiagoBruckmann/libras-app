@@ -39,19 +39,14 @@ class _SplashScreenState extends State<SplashScreen> {
   _verifyLogin() async {
 
     var verifyLogin = RoutesAPI.verifyLogin;
-    print("verifyLogin => $verifyLogin");
-
     final token = await _storage.read(key: "keyToken");
 
     var header = {
       "content-type" : "application/json",
       "Authorization": "Bearer $token"
     };
-    print("header => $header");
 
     final response = await http.get(verifyLogin, headers: header);
-    print("response => ${response.statusCode}");
-    print("response => ${response.body}");
 
     // Logando o usuario se o codigo HTTP for 200 e redirecionando para a tela Home;
     if( response.statusCode == 200 || response.statusCode == 204 ) {
