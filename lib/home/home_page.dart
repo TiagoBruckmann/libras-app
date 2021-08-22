@@ -1,9 +1,7 @@
 // imports nativos do flutter
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:libras/Games/MemoryGame/MemoryGame.dart';
 import 'dart:convert' as convert;
+import 'dart:async';
 
 // import dos core
 import 'package:libras/core/Routes/RoutesApi.dart';
@@ -15,6 +13,7 @@ import 'package:http/http.dart' as http;
 
 // import das telas
 import 'package:libras/home/widgets/appbar/app_bar_widget.dart';
+import 'package:libras/Games/MemoryGame/MemoryGameHome.dart';
 
 class HomePage extends StatefulWidget {
 
@@ -85,7 +84,7 @@ class _HomePageState extends State<HomePage> {
       context,
       MaterialPageRoute(
         builder: (context) =>
-          MemoryGame(
+          MemoryGameHome(
             token: widget.token,
           ),
       ),
@@ -109,11 +108,12 @@ class _HomePageState extends State<HomePage> {
     if ( _name != null ) {
       return Scaffold(
         appBar: AppBarWidget( name: _name, photo: _photo, nextLevel: _nextLevel ),
-        body: Padding(
-          padding: EdgeInsets.symmetric( horizontal: 20 ),
-          child: Column(
-            children: [
-              /*
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric( horizontal: 20 ),
+            child: Column(
+              children: [
+                /*
               SizedBox(
                 height: 24,
               ),
@@ -136,93 +136,94 @@ class _HomePageState extends State<HomePage> {
               ),
               */
 
-              SizedBox(
-                height: 24,
-              ),
-
-              // jogar quizz
-              Padding(
-                padding: EdgeInsets.only(top: 16, bottom: 10),
-                child: ElevatedButton(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        height: 40,
-                        width: 40,
-                        child: Image.asset(
-                            AppImages.blocks
-                        ),
-                      ),
-
-                      Padding(
-                        padding: EdgeInsets.only(right: 5),
-                      ),
-                      Text(
-                        "Jogar quizz",
-                        style: TextStyle(
-                          color: Colors.deepPurple,
-                          fontSize: 20,
-                        ),
-                      ),
-                    ],
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    primary: AppColors.levelButtonDificil,
-                    padding: EdgeInsets.fromLTRB(36, 16, 36, 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                  ),
-                  onPressed: () {
-                    _quizzGame();
-                  },
+                SizedBox(
+                  height: 24,
                 ),
-              ),
 
-              // jogo da memoria
-              Padding(
-                padding: EdgeInsets.only(top: 16, bottom: 10),
-                child: ElevatedButton(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        height: 40,
-                        width: 40,
-                        child: Image.asset(
-                            AppImages.data
+                // jogar quizz
+                Padding(
+                  padding: EdgeInsets.only(top: 16, bottom: 10),
+                  child: ElevatedButton(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          height: 40,
+                          width: 40,
+                          child: Image.asset(
+                              AppImages.blocks
+                          ),
                         ),
-                      ),
 
-                      Padding(
-                        padding: EdgeInsets.only(right: 5),
-                      ),
-                      Text(
-                        "Jogo da memória",
-                        style: TextStyle(
-                          color: Colors.deepPurple,
-                          fontSize: 20,
+                        Padding(
+                          padding: EdgeInsets.only(right: 5),
                         ),
-                      ),
-                    ],
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    primary: AppColors.levelButtonDificil,
-                    padding: EdgeInsets.fromLTRB(36, 16, 36, 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
+                        Text(
+                          "Jogar quizz",
+                          style: TextStyle(
+                            color: Colors.deepPurple,
+                            fontSize: 20,
+                          ),
+                        ),
+                      ],
                     ),
+                    style: ElevatedButton.styleFrom(
+                      primary: AppColors.levelButtonDificil,
+                      padding: EdgeInsets.fromLTRB(36, 16, 36, 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    onPressed: () {
+                      _quizzGame();
+                    },
                   ),
-                  onPressed: () {
-                    _memoryGame();
-                  },
                 ),
-              ),
 
-            ],
+                // jogo da memoria
+                Padding(
+                  padding: EdgeInsets.only(top: 16, bottom: 10),
+                  child: ElevatedButton(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          height: 40,
+                          width: 40,
+                          child: Image.asset(
+                              AppImages.data
+                          ),
+                        ),
+
+                        Padding(
+                          padding: EdgeInsets.only(right: 5),
+                        ),
+                        Text(
+                          "Jogo da memória",
+                          style: TextStyle(
+                            color: Colors.deepPurple,
+                            fontSize: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      primary: AppColors.levelButtonDificil,
+                      padding: EdgeInsets.fromLTRB(36, 16, 36, 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    onPressed: () {
+                      _memoryGame();
+                    },
+                  ),
+                ),
+
+              ],
+            ),
           ),
-        ),
+        )
       );
     } else {
       return Scaffold(
