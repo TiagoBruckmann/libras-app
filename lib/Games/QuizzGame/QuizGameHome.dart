@@ -4,6 +4,7 @@ import 'dart:convert' as convert;
 
 // import dos pacotes
 import 'package:http/http.dart' as http;
+import 'package:libras/Games/QuizzGame/QuizGame.dart';
 
 // import dos modelos
 import 'package:libras/core/Models/ModelCategories.dart';
@@ -12,19 +13,18 @@ import 'package:libras/core/Models/ModelCategories.dart';
 import 'package:libras/core/Routes/RoutesApi.dart';
 import 'package:libras/core/app_colors.dart';
 
-// import das telas
-import 'package:libras/Games/MemoryGame/MemoryGame.dart';
 
-class MemoryGameHome extends StatefulWidget {
+class QuizGameHome extends StatefulWidget {
 
   final String token;
-  const MemoryGameHome({Key key, this.token}) : super(key: key);
+  final int questionLevel;
+  const QuizGameHome({ Key key, this.token, this.questionLevel }) : super(key: key);
 
   @override
-  _MemoryGameHomeState createState() => _MemoryGameHomeState();
+  _QuizGameHomeState createState() => _QuizGameHomeState();
 }
 
-class _MemoryGameHomeState extends State<MemoryGameHome> {
+class _QuizGameHomeState extends State<QuizGameHome> {
 
   // variaveis da tela
   List<ModelCategories> _listCategories = [];
@@ -59,18 +59,23 @@ class _MemoryGameHomeState extends State<MemoryGameHome> {
   }
 
   // ir para o jogo
-  _goMemoryGame( ModelCategories modelCategories ) {
+  _goQuizGame( ModelCategories modelCategories ) {
 
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) =>
-          MemoryGame(
+          QuizGame(
             token: widget.token,
             categoryId: modelCategories.id,
+            questionLevel: widget.questionLevel,
           ),
       ),
     );
+
+    setState(() {
+      _listCategories.clear();
+    });
 
   }
 
@@ -78,7 +83,7 @@ class _MemoryGameHomeState extends State<MemoryGameHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Jogo da memória"),
+        title: Text("Quiz"),
       ),
 
       body: FutureBuilder<ModelCategories>(
@@ -113,12 +118,16 @@ class _MemoryGameHomeState extends State<MemoryGameHome> {
                     child: Column(
                       children: [
 
+                        ( index == 0 )
+                        ? Text("Escolha uma categoria de jogo")
+                        : Padding(padding: EdgeInsets.zero),
+
                         Row(
                           children: [
 
                             GestureDetector(
                               onTap: () {
-                                _goMemoryGame( modelCategories );
+                                _goQuizGame( modelCategories );
                               },
                               child: Text(
                                 "${modelCategories.name}",

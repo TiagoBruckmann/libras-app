@@ -2,21 +2,18 @@ class ModelQuestions {
 
   int id;
   String awnser;
-  String banner;
 
-  ModelQuestions( this.id, this.awnser, this.banner );
+  ModelQuestions( this.id, this.awnser );
 
-  ModelQuestions.complete( int id, String awnser, String banner ) {
+  ModelQuestions.complete( int id, String awnser ) {
     this.id = id;
     this.awnser = awnser;
-    this.banner = banner;
   }
 
   factory ModelQuestions.fromJson( Map<String, dynamic> json ) {
     return ModelQuestions (
       json["id"],
-      json["awnser"],
-      json["banner"]
+      json["awnser"]
     );
   }
 

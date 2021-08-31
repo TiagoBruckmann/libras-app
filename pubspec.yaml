@@ -2,7 +2,7 @@ name: libras
 description: aplicação para desenvolvimento de um game para aprendizado de libras
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.0.0+7
+version: 1.0.0+10
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -15,6 +15,9 @@ dependencies:
   google_fonts: ^2.1.0 # fontes do google
   http: ^0.13.3 # requisicoes HTTP
   flutter_secure_storage: ^4.2.1 # salvar informações local
+  video_player: ^2.1.14 # play and pause video
+  flick_video_player: ^0.3.1 # video da pergunta
+  visibility_detector: ^0.2.0 # ver status do video
 
 dev_dependencies:
   flutter_test:

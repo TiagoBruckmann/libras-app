@@ -13,7 +13,7 @@ import 'package:http/http.dart' as http;
 
 // import das telas
 import 'package:libras/home/widgets/appbar/app_bar_widget.dart';
-import 'package:libras/Games/MemoryGame/MemoryGameHome.dart';
+import 'package:libras/Games/QuizzGame/QuizGameHome.dart';
 
 class HomePage extends StatefulWidget {
 
@@ -30,6 +30,7 @@ class _HomePageState extends State<HomePage> {
   String _name = "";
   String _photo = "";
   double _nextLevel = 0;
+  int _questionLevel;
 
   _getUser() async {
     var getUser = RoutesAPI.getUser;
@@ -60,32 +61,29 @@ class _HomePageState extends State<HomePage> {
         _name = userDetail["name"];
         _photo = uiAvatar.toString();
         _nextLevel = convertNextLevel;
+        _questionLevel = userDetail["question_level"];
       });
 
     } else if ( response.statusCode == 401 || response.statusCode == 400 ) {
 
-      setState(() {
-        print("Usuario e/ou senha invalidos, tente novamente");
-      });
+      print("Não foi possivel concluir a chamada de informações, por favor tente novamente.");
 
     } else if ( response.statusCode == 500 ) {
-      print("Nossos serviços estão temporariamente indisponoveis");
+
+      print("Nossos serviços estão temporariamente indisponoveis.");
+
     }
   }
 
   // ir para o quizz
   _quizzGame() {
-    print("Quizz");
-  }
-
-  // ir para o jogo da memoria
-  _memoryGame() {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) =>
-          MemoryGameHome(
+          QuizGameHome(
             token: widget.token,
+            questionLevel: _questionLevel
           ),
       ),
     ).then(_onGoBack);
@@ -159,7 +157,7 @@ class _HomePageState extends State<HomePage> {
                           padding: EdgeInsets.only(right: 5),
                         ),
                         Text(
-                          "Jogar quizz",
+                          "Quizz",
                           style: TextStyle(
                             color: Colors.deepPurple,
                             fontSize: 20,
@@ -176,46 +174,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                     onPressed: () {
                       _quizzGame();
-                    },
-                  ),
-                ),
-
-                // jogo da memoria
-                Padding(
-                  padding: EdgeInsets.only(top: 16, bottom: 10),
-                  child: ElevatedButton(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          height: 40,
-                          width: 40,
-                          child: Image.asset(
-                              AppImages.data
-                          ),
-                        ),
-
-                        Padding(
-                          padding: EdgeInsets.only(right: 5),
-                        ),
-                        Text(
-                          "Jogo da memória",
-                          style: TextStyle(
-                            color: Colors.deepPurple,
-                            fontSize: 20,
-                          ),
-                        ),
-                      ],
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      primary: AppColors.levelButtonDificil,
-                      padding: EdgeInsets.fromLTRB(36, 16, 36, 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                    ),
-                    onPressed: () {
-                      _memoryGame();
                     },
                   ),
                 ),

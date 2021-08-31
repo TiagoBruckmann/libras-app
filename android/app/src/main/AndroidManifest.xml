@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="br.com.libras">
+    <uses-permission android:name="android.permission.INTERNET"/>
     <!-- apenas quando esta sendo compilado local utilizado na primeira linha de aplication -->
     <!-- android:usesCleartextTraffic="true" -->
    <application

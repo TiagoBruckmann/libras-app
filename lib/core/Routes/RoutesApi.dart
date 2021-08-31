@@ -23,6 +23,9 @@ class RoutesAPI {
   // memory game
   static final memoryGame = Uri.http("$urlDefault", "/api/v1/memory-game");
 
+  // quizz game
+  static final quizzGame = Uri.http("$urlDefault", "/api/v1/quizz-game");
+
 }
 
 // var scheduledConsult = RoutesAPI.scheduledConsult;
