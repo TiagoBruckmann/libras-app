@@ -5,8 +5,9 @@ import 'package:libras/home/widgets/chart/chart_widget.dart';
 
 class ScoreCardWidget extends StatelessWidget {
 
+  final int level;
   final double nextLevel;
-  ScoreCardWidget({ this.nextLevel });
+  ScoreCardWidget({ this.level, this.nextLevel });
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +40,12 @@ class ScoreCardWidget extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+
+                        Text(
+                          "Nível: $level",
+                          style: AppTextStyles.heading15,
+                        ),
+
                         Text(
                           "Vamos Começar",
                           style: AppTextStyles.heading,

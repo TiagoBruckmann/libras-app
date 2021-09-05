@@ -1,6 +1,7 @@
 // imports nativos do flutter
 import 'package:flutter/material.dart';
 import 'dart:convert' as convert;
+import 'dart:async';
 
 // import dos pacotes
 import 'package:visibility_detector/visibility_detector.dart';
@@ -11,7 +12,11 @@ import 'package:http/http.dart' as http;
 // import dos core
 import 'package:libras/core/Models/ModelQuestions.dart';
 import 'package:libras/core/Routes/RoutesApi.dart';
+import 'package:libras/core/app_images.dart';
 import 'package:libras/core/app_colors.dart';
+
+// import das telas
+import 'package:libras/home/home_page.dart';
 
 class QuizGame extends StatefulWidget {
 
@@ -40,6 +45,9 @@ class _QuizGameState extends State<QuizGame> {
 
   // variaveis para rodar o video
   FlickManager _flickManager;
+
+  // tempo permitido por requisição
+  Timer _timer;
 
   // buscar perguntas
   _getQuestions() async {
@@ -98,18 +106,33 @@ class _QuizGameState extends State<QuizGame> {
       });
 
     } else if ( response.statusCode == 400 ||  response.statusCode == 401 ) {
-      print("Não foi possível buscar as perguntas, tente novamente mais tarde");
+      setState(() {
+        _message = "Não foi possível buscar as perguntas, tente novamente mais tarde.";
+        _success = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar( _infoMessage() );
     } else if ( response.statusCode == 500 ) {
-      print("nossos serviços estão temporariamente indisponíveis");
+      setState(() {
+        _message = "Nossos serviços estão temporariamente indisponoveis.";
+        _success = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar( _infoMessage() );
     }
   }
 
+  // validacao da resposta e calculo de pontos
   _validateAwnser( var awnser ) {
 
     if ( awnser.id != _awnserId ) {
       // remove a resposta errada
       setState(() {
         _listAwnsers.removeWhere((element) => element.id == awnser.id);
+        _message = "Resposta incorreta, tente novamente.";
+        _success = false;
+      });
+      _awnserCorrectly();
+      _timer = Timer(Duration(seconds: 1), () {
+        Navigator.pop(context);
       });
 
     } else {
@@ -171,6 +194,7 @@ class _QuizGameState extends State<QuizGame> {
     }
   }
 
+  // atualizar o nivel do usuário
   _updateLevel() async {
     var updateLevel = RoutesAPI.updateLevel;
 
@@ -189,35 +213,57 @@ class _QuizGameState extends State<QuizGame> {
     if ( response.statusCode == 200 || response.statusCode == 204 ) {
 
       _rightAwnser++;
-      print("_rightAwnser => $_rightAwnser");
       if ( _rightAwnser < 4 ) {
         setState(() {
           _message = "Parabéns, resposta correta uma nova pergunta foi gerada.";
           _success = true;
         });
-        ScaffoldMessenger.of(context).showSnackBar( _infoMessage() );
+        // ScaffoldMessenger.of(context).showSnackBar( _infoMessage() );
+        _awnserCorrectly();
+        _timer = Timer(Duration(seconds: 2), () {
+          Navigator.pop(context);
+        });
       } else {
         setState(() {
           _message = "Parabéns, desafio concluído.";
           _success = true;
         });
-        ScaffoldMessenger.of(context).showSnackBar( _infoMessage() );
-        Navigator.pop(context);
+        _awnserCorrectly();
+
+        _timer = Timer(Duration(seconds: 2), () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomePage(
+                token: widget.token,
+              ),
+            ),
+          );
+        });
 
       }
 
     } else if ( response.statusCode == 401 || response.statusCode == 400 ) {
 
-      print("Não foi possivel concluir a chamada de informações, por favor tente novamente.");
+      setState(() {
+        _message = "Não foi possivel concluir a chamada de informações, por favor tente novamente.";
+        _success = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar( _infoMessage() );
 
     } else if ( response.statusCode == 500 ) {
 
-      print("Nossos serviços estão temporariamente indisponoveis.");
+      setState(() {
+        _message = "Nossos serviços estão temporariamente indisponoveis.";
+        _success = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar( _infoMessage() );
 
     }
 
   }
 
+  // texto informativo
   _infoMessage() {
     final snackBar = SnackBar(
       content: Text(
@@ -233,6 +279,52 @@ class _QuizGameState extends State<QuizGame> {
     return snackBar;
   }
 
+  // resposta certa / errada
+  _awnserCorrectly() {
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (contex) {
+        return Container(
+          padding: EdgeInsets.fromLTRB(16, 150, 16, 0),
+          child: Center(
+            child: Column(
+              children: [
+                AlertDialog(
+                  title: Text(
+                    "$_message",
+                    textAlign: TextAlign.center,
+                  ),
+                  content: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+
+                      // exibicao da resposta
+                      Image.asset(
+                        ( _success == true )
+                        ? AppImages.check
+                        : AppImages.error,
+                        width: 150,
+                        height: 150,
+                      ),
+
+                    ],
+                  ),
+
+                  contentPadding: EdgeInsets.all(16),
+
+
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+    );
+
+  }
+
   @override
   void initState() {
     super.initState();
@@ -243,13 +335,14 @@ class _QuizGameState extends State<QuizGame> {
   void dispose() {
     super.dispose();
     _flickManager.dispose();
+    _timer.cancel();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Quizz"),
+        title: Text("Quizz ($_rightAwnser/4)"),
       ),
 
       body: ( _questionBanner != null )

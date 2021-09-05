@@ -31,8 +31,13 @@ class _HomePageState extends State<HomePage> {
   // variaveis da tela
   String _name = "";
   String _photo = "";
+  int _level = 1;
   double _nextLevel = 0;
   List<ModelCategories> _listCategories = [];
+
+  // variaveis de informacao
+  String _message;
+  bool _success;
 
   // buscar os dados dos usuarios
   _getUser() async {
@@ -63,16 +68,25 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         _name = userDetail["name"];
         _photo = uiAvatar.toString();
+        _level = userDetail["level"];
         _nextLevel = convertNextLevel;
       });
 
     } else if ( response.statusCode == 401 || response.statusCode == 400 ) {
 
-      print("Não foi possivel concluir a chamada de informações, por favor tente novamente.");
+      setState(() {
+        _message = "Não foi possivel concluir a chamada de informações, por favor tente novamente.";
+        _success = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar( _infoMessage() );
 
     } else if ( response.statusCode == 500 ) {
 
-      print("Nossos serviços estão temporariamente indisponoveis.");
+      setState(() {
+        _message = "Nossos serviços estão temporariamente indisponoveis.";
+        _success = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar( _infoMessage() );
 
     }
   }
@@ -106,9 +120,21 @@ class _HomePageState extends State<HomePage> {
       }
 
     } else if ( response.statusCode == 400 ||  response.statusCode == 401 ) {
-      print("Não foi possível buscar os níveis existentes, tente novamente mais tarde");
+
+      setState(() {
+        _message = "Não foi possível buscar os níveis existentes, tente novamente mais tarde.";
+        _success = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar( _infoMessage() );
+
     } else if ( response.statusCode == 500 ) {
-      print("nossos serviços estão temporariamente indisponíveis");
+
+      setState(() {
+        _message = "Nossos serviços estão temporariamente indisponoveis.";
+        _success = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar( _infoMessage() );
+
     }
 
   }
@@ -141,6 +167,22 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  // texto informativo
+  _infoMessage() {
+    final snackBar = SnackBar(
+      content: Text(
+        "$_message",
+        style: TextStyle(
+            color: Colors.white
+        ),
+      ),
+      backgroundColor: ( _success == false )
+      ? Colors.red
+      : Colors.green
+    );
+    return snackBar;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -154,6 +196,7 @@ class _HomePageState extends State<HomePage> {
         appBar: AppBarWidget(
           name: _name,
           photo: _photo,
+          level: _level,
           nextLevel: _nextLevel,
         ),
 

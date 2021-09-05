@@ -1,12 +1,8 @@
-// import nativos do flutter
+// imports nativos do flutter
 import 'package:flutter/material.dart';
 import 'dart:convert' as convert;
 
-// import dos pacotes
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
-
-// imports core
+// import core
 import 'package:libras/core/Routes/RoutesApi.dart';
 import 'package:libras/core/app_gradients.dart';
 import 'package:libras/core/app_colors.dart';
@@ -15,104 +11,141 @@ import 'package:libras/core/app_images.dart';
 // import dos modelos
 import 'package:libras/core/Models/Users/Users.dart';
 
+// import dos pacotes
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
+
 // import das telas
-import 'package:libras/Login/Register.dart';
 import 'package:libras/home/home_page.dart';
 
-class Login extends StatefulWidget {
-  const Login({Key key}) : super(key: key);
+class Register extends StatefulWidget {
+  const Register({Key key}) : super(key: key);
 
   @override
-  _LoginState createState() => _LoginState();
+  _RegisterState createState() => _RegisterState();
 }
 
-class _LoginState extends State<Login> {
+class _RegisterState extends State<Register> {
 
-  // variaveis da tela
+  // controladores de texto
+  TextEditingController _controllerName = TextEditingController();
   TextEditingController _controllerEmail = TextEditingController();
   TextEditingController _controllerSenha = TextEditingController();
-  // TextEditingController _controllerEmail = TextEditingController(text: "tiagobruckmann@gmail.com");
-  // TextEditingController _controllerSenha = TextEditingController(text: "1234");
+
+  // variaveis da tela
+  String _token;
   bool _passwdVisible = false;
   String _mensageError = "";
-
-  // token
-  String _token = "";
 
   // salvamento seguro de informações
   final _storage = FlutterSecureStorage();
 
-  // alterar a visibilidade da senha
-  _changeVisible() {
-    if ( _passwdVisible == false )
-    {
-      setState(() {
-        _passwdVisible = true;
-      });
-    } else {
-      setState(() {
-        _passwdVisible = false;
-      });
-    }
-  }
-
-  // Validação pelo APP e envio para a API
-  _validateFields(){
+  // validacao dos campos
+  _validateFields() {
 
     //Recupera dados dos campos
+    String name = _controllerName.text;
     String mail = _controllerEmail.text;
     String password = _controllerSenha.text;
 
-    if( mail.isNotEmpty && mail.contains("@") && ( mail.contains(".com") || mail.contains(".br") ) ){
+    if ( name.isNotEmpty ) {
 
-      if( password.isNotEmpty ){
+      if( mail.isNotEmpty && mail.contains("@") && ( mail.contains(".com") || mail.contains(".br") ) ){
 
-        setState(() {
-          _mensageError = "";
-        });
+        if( password.isNotEmpty ){
 
-        Users users = Users();
-        users.mail = mail;
-        users.password = password;
+          setState(() {
+            _mensageError = "";
+          });
 
-        _userLogin( users );
+          Users users = Users();
+          users.name = name;
+          users.mail = mail;
+          users.password = password;
+
+          _registerUser( users );
+
+        }else{
+          setState(() {
+            _mensageError = "Preencha a senha!";
+          });
+        }
 
       }else{
         setState(() {
-          _mensageError = "Preencha a senha!";
+          _mensageError = "Preencha um e-mail valido";
         });
       }
 
-    }else{
+    } else {
       setState(() {
-        _mensageError = "Preencha um e-mail valido";
+        _mensageError = "Preencha seu nome.";
       });
     }
 
   }
 
-  // Validação com a API e Login
-  _userLogin( Users users ) async {
+  // cadastrar usuario
+  _registerUser( Users users ) async {
 
-    var login = RoutesAPI.login;
-    http.Response response;
+    var register = RoutesAPI.register;
 
     var header = {
       "content-type" : "application/json"
     };
 
     Map params = {
+      "name": users.name,
       "mail": users.mail,
-      "password": users.password
+      "password": users.password,
     };
 
     var _body = convert.jsonEncode(params);
-    response = await http.post(login, headers: header, body: _body);
+    final response = await http.post(register, headers: header, body: _body);
+
+    // Logando o usuario se o codigo HTTP for 200 e redirecionando para a tela Home;
+    if( response.statusCode == 200 || response.statusCode == 204 ) {
+
+      _login();
+
+    } else if ( response.statusCode == 302 ) {
+
+      setState(() {
+        _mensageError = "Já existe uma conta com este endereço de e-mail.";
+      });
+
+    } else if ( response.statusCode == 401 || response.statusCode == 400 ) {
+
+      setState(() {
+        _mensageError = "Não foi possível cadastrar sua conta, tente novamente";
+      });
+
+    } else if ( response.statusCode == 500 ) {
+      _mensageError = "Nossos serviços estão temporariamente indisponoveis";
+    }
+
+  }
+
+  // conectar
+  _login() async {
+
+    var login = RoutesAPI.login;
+
+    var header = {
+      "content-type" : "application/json"
+    };
+
+    Map params = {
+      "mail": _controllerEmail.text,
+      "password": _controllerSenha.text,
+    };
+
+    var _body = convert.jsonEncode(params);
+    final response = await http.post(login, headers: header, body: _body);
     var token = convert.jsonDecode(response.body);
     _token = token["token"];
 
-    // Logando o usuario se o codigo HTTP for 200 e redirecionando para a tela Home;
-    if( response.statusCode == 200 ) {
+    if ( response.statusCode == 200 ) {
 
       _saveCredentials();
 
@@ -128,12 +161,17 @@ class _LoginState extends State<Login> {
     } else if ( response.statusCode == 401 || response.statusCode == 400 ) {
 
       setState(() {
-        _mensageError = "Usuario e/ou senha invalidos, tente novamente";
+        _mensageError = "Usuario e/ou senha invalidos, tente novamente.";
       });
 
     } else if ( response.statusCode == 500 ) {
-      _mensageError = "Nossos serviços estão temporariamente indisponoveis";
+
+      setState(() {
+        _mensageError = "Nossos serviços estão temporariamente indisponoveis.";
+      });
+
     }
+
   }
 
   // salvar credenciais de login
@@ -143,21 +181,27 @@ class _LoginState extends State<Login> {
     await _storage.write( key: keyToken, value: token );
   }
 
-  // cadastrar usuario
-  _register() {
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => Register(),
-      ),
-    );
-
+  // alterar a visibilidade da senha
+  _changeVisible() {
+    if ( _passwdVisible == false )
+    {
+      setState(() {
+        _passwdVisible = true;
+      });
+    } else {
+      setState(() {
+        _passwdVisible = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Cadastro"),
+      ),
+
       body: Container(
         decoration: BoxDecoration(
           gradient: AppGradients.linear,
@@ -181,9 +225,43 @@ class _LoginState extends State<Login> {
                   padding: EdgeInsets.all(30),
                   child: Center(
                     child: Text(
-                      "Autenticação",
+                      "Registro",
                       style: TextStyle(
                           fontSize: 25
+                      ),
+                    ),
+                  ),
+                ),
+
+                // nome
+                Padding(
+                  padding: EdgeInsets.only(bottom: 8),
+                  child: TextField(
+                    controller: _controllerName,
+                    keyboardType: TextInputType.emailAddress,
+                    style: TextStyle(fontSize: 20),
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.fromLTRB(16, 16, 16, 16),
+                      hintText: "Nome",
+                      labelText: "Nome",
+                      filled: true,
+                      fillColor: AppColors.malibu,
+                      labelStyle: TextStyle(
+                        color: Colors.black,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Colors.black,
+                          )
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.black,
+                        ),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5),
                       ),
                     ),
                   ),
@@ -206,9 +284,9 @@ class _LoginState extends State<Login> {
                         color: Colors.black,
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.black,
-                        )
+                          borderSide: BorderSide(
+                            color: Colors.black,
+                          )
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
@@ -222,6 +300,8 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                 ),
+
+                // senha
                 TextField(
                   controller: _controllerSenha,
                   obscureText: ( _passwdVisible == false )
@@ -244,8 +324,8 @@ class _LoginState extends State<Login> {
                       },
                       child: Icon(
                         ( _passwdVisible == false )
-                            ? Icons.visibility_off
-                            : Icons.visibility,
+                        ? Icons.visibility_off
+                        : Icons.visibility,
                         color: Colors.black,
                       ),
                     ),
@@ -279,7 +359,7 @@ class _LoginState extends State<Login> {
                           padding: EdgeInsets.only(right: 5),
                         ),
                         Text(
-                          "Entrar",
+                          "Cadastrar",
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 20,
@@ -300,28 +380,6 @@ class _LoginState extends State<Login> {
                   ),
                 ),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        _register();
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(20, 15, 20, 10),
-                        child: Text(
-                          "Não possui uma conta? Cadastre-se",
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                  ],
-                ),
                 Padding(
                   padding: EdgeInsets.only(top: 16),
                   child: Center(
@@ -334,6 +392,7 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                 ),
+
               ],
             ),
           ),
