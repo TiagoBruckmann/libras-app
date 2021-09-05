@@ -17,8 +17,7 @@ class QuizGame extends StatefulWidget {
 
   final String token;
   final int categoryId;
-  final int questionLevel;
-  const QuizGame({ Key key, this.token, this.categoryId, this.questionLevel }) : super(key: key);
+  const QuizGame({ Key key, this.token, this.categoryId }) : super(key: key);
 
   @override
   _QuizGameState createState() => _QuizGameState();
@@ -32,6 +31,12 @@ class _QuizGameState extends State<QuizGame> {
   int _awnserId;
   List<ModelQuestions> _listAwnsers = [];
   double _qtyLevel;
+  int _questionLevel = 1;
+  int _rightAwnser = 0;
+
+  // variaveis para a mensagem
+  String _message;
+  bool _success;
 
   // variaveis para rodar o video
   FlickManager _flickManager;
@@ -60,6 +65,7 @@ class _QuizGameState extends State<QuizGame> {
         _title = dataReturn["question"]["title"];
         _questionBanner = dataReturn["question"]["banner"];
         _awnserId = dataReturn["question"]["awnser_id"];
+        _questionLevel = dataReturn["question_level"];
       });
 
       // lista de respostas
@@ -83,10 +89,13 @@ class _QuizGameState extends State<QuizGame> {
       // randomizar as respostas
       _listAwnsers.shuffle();
 
-      _flickManager = FlickManager(
-        videoPlayerController: VideoPlayerController.network("https://www.youtube.com/watch?v=3Ga5s01VCBQ"),
-        // videoPlayerController: VideoPlayerController.network("$_questionBanner"),
-      );
+      setState(() {
+        _flickManager = FlickManager(
+          videoPlayerController: VideoPlayerController.network(
+            "$_questionBanner",
+          ),
+        );
+      });
 
     } else if ( response.statusCode == 400 ||  response.statusCode == 401 ) {
       print("Não foi possível buscar as perguntas, tente novamente mais tarde");
@@ -97,22 +106,15 @@ class _QuizGameState extends State<QuizGame> {
 
   _validateAwnser( var awnser ) {
 
-    print("awnser.id => ${awnser.id}");
-    print("awnser.awnser => ${awnser.awnser}");
-    print("_listAwnsers 1 => $_listAwnsers");
-    print("_listAwnsers.length 1 => ${_listAwnsers.length}");
-    print("_listAwnsers.length 1 => ${_listAwnsers.contains("BonoVoiage")}");
-
     if ( awnser.id != _awnserId ) {
-      print("O miseravel é um miseravel");
       // remove a resposta errada
-
-      _listAwnsers.remove("BonoVoiage");
-      print("_listAwnsers.length => ${_listAwnsers.length}");
+      setState(() {
+        _listAwnsers.removeWhere((element) => element.id == awnser.id);
+      });
 
     } else {
 
-      if ( widget.questionLevel == 1 ) {
+      if ( _questionLevel == 1 ) {
 
         if ( _listAwnsers.length == 4 ) {
           _qtyLevel = 5.0;
@@ -124,7 +126,7 @@ class _QuizGameState extends State<QuizGame> {
           _qtyLevel = 5 * 0.2;
         }
 
-      } else if ( widget.questionLevel == 2 ) {
+      } else if ( _questionLevel == 2 ) {
 
         if ( _listAwnsers.length == 4 ) {
           _qtyLevel = 7.0;
@@ -136,7 +138,7 @@ class _QuizGameState extends State<QuizGame> {
           _qtyLevel = 7 * 0.2;
         }
 
-      } else if ( widget.questionLevel == 3 ) {
+      } else if ( _questionLevel == 3 ) {
 
         if ( _listAwnsers.length == 4 ) {
           _qtyLevel = 9.0;
@@ -186,7 +188,23 @@ class _QuizGameState extends State<QuizGame> {
 
     if ( response.statusCode == 200 || response.statusCode == 204 ) {
 
-      print("sucesso");
+      _rightAwnser++;
+      print("_rightAwnser => $_rightAwnser");
+      if ( _rightAwnser < 4 ) {
+        setState(() {
+          _message = "Parabéns, resposta correta uma nova pergunta foi gerada.";
+          _success = true;
+        });
+        ScaffoldMessenger.of(context).showSnackBar( _infoMessage() );
+      } else {
+        setState(() {
+          _message = "Parabéns, desafio concluído.";
+          _success = true;
+        });
+        ScaffoldMessenger.of(context).showSnackBar( _infoMessage() );
+        Navigator.pop(context);
+
+      }
 
     } else if ( response.statusCode == 401 || response.statusCode == 400 ) {
 
@@ -198,6 +216,21 @@ class _QuizGameState extends State<QuizGame> {
 
     }
 
+  }
+
+  _infoMessage() {
+    final snackBar = SnackBar(
+      content: Text(
+        "$_message",
+        style: TextStyle(
+            color: Colors.white
+        ),
+      ),
+      backgroundColor: ( _success == false )
+      ? Colors.red
+      : Colors.green
+    );
+    return snackBar;
   }
 
   @override
@@ -221,7 +254,7 @@ class _QuizGameState extends State<QuizGame> {
 
       body: ( _questionBanner != null )
         ? VisibilityDetector(
-        key:ObjectKey(_flickManager),
+        key:ObjectKey( _flickManager ),
         onVisibilityChanged: ( visibility ) {
           if ( visibility.visibleFraction == 0 && this.mounted ) {
             _flickManager.flickControlManager.autoPause();
@@ -235,12 +268,15 @@ class _QuizGameState extends State<QuizGame> {
               children: [
 
                 // pergunta
-                Text(
-                  "$_title",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+                Padding(
+                  padding: EdgeInsets.only( bottom: 20 ),
+                  child: Text(
+                    "$_title",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
 
@@ -291,8 +327,10 @@ class _QuizGameState extends State<QuizGame> {
             )
         ),
       )
-      : CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation<Color>(AppColors.darkGreen),
+      : Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(AppColors.darkGreen),
+        ),
       ),
     );
   }

@@ -13,7 +13,7 @@ class ModelQuestions {
   factory ModelQuestions.fromJson( Map<String, dynamic> json ) {
     return ModelQuestions (
       json["id"],
-      json["awnser"]
+      json["awnser"],
     );
   }
 

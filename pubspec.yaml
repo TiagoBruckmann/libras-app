@@ -2,7 +2,7 @@ name: libras
 description: aplicação para desenvolvimento de um game para aprendizado de libras
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.0.0+10
+version: 1.0.0+11
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -28,4 +28,3 @@ flutter:
 
   assets:
     - assets/images/
-    - assets/images/cards/

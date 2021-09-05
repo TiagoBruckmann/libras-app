@@ -5,7 +5,6 @@ import 'package:libras/core/app_text_styles.dart';
 class ChartWidget extends StatelessWidget {
 
   final double nextLevel;
-
   ChartWidget({ this.nextLevel });
 
   @override
@@ -26,7 +25,7 @@ class ChartWidget extends StatelessWidget {
               child: CircularProgressIndicator(
                 strokeWidth: 10,
                 value: newNextLevel,
-                 backgroundColor: AppColors.chartSecondary,
+                backgroundColor: AppColors.chartSecondary,
                 valueColor: AlwaysStoppedAnimation<Color>(
                   AppColors.chartPrimary,
                 ),

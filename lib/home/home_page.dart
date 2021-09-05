@@ -5,15 +5,17 @@ import 'dart:async';
 
 // import dos core
 import 'package:libras/core/Routes/RoutesApi.dart';
-import 'package:libras/core/app_images.dart';
 import 'package:libras/core/app_colors.dart';
+
+// import dos modelos
+import 'package:libras/core/Models/ModelCategories.dart';
 
 // import dos pacotes
 import 'package:http/http.dart' as http;
 
 // import das telas
 import 'package:libras/home/widgets/appbar/app_bar_widget.dart';
-import 'package:libras/Games/QuizzGame/QuizGameHome.dart';
+import 'package:libras/Games/QuizGame.dart';
 
 class HomePage extends StatefulWidget {
 
@@ -30,8 +32,9 @@ class _HomePageState extends State<HomePage> {
   String _name = "";
   String _photo = "";
   double _nextLevel = 0;
-  int _questionLevel;
+  List<ModelCategories> _listCategories = [];
 
+  // buscar os dados dos usuarios
   _getUser() async {
     var getUser = RoutesAPI.getUser;
 
@@ -61,7 +64,6 @@ class _HomePageState extends State<HomePage> {
         _name = userDetail["name"];
         _photo = uiAvatar.toString();
         _nextLevel = convertNextLevel;
-        _questionLevel = userDetail["question_level"];
       });
 
     } else if ( response.statusCode == 401 || response.statusCode == 400 ) {
@@ -75,28 +77,72 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  // buscar as categorias de perguntas
+  Future<ModelCategories> _getCategories() async {
+    var getCategories = RoutesAPI.getCategories;
+
+    var header = {
+      "content-type" : "application/json",
+      "Authorization": "Bearer ${widget.token}"
+    };
+
+    final response = await http.get(getCategories, headers: header);
+
+    if ( response.statusCode == 200 ) {
+
+      var dataReturn = convert.jsonDecode(response.body);
+      int totalCategories = dataReturn["total"];
+
+      if ( _listCategories.length < totalCategories ) {
+
+        for ( var item in dataReturn["data"] ) {
+          ModelCategories modelCategories = ModelCategories(
+              item["id"],
+              item["name"],
+          );
+          _listCategories.add(modelCategories);
+        }
+
+      }
+
+    } else if ( response.statusCode == 400 ||  response.statusCode == 401 ) {
+      print("Não foi possível buscar os níveis existentes, tente novamente mais tarde");
+    } else if ( response.statusCode == 500 ) {
+      print("nossos serviços estão temporariamente indisponíveis");
+    }
+
+  }
+
   // ir para o quizz
-  _quizzGame() {
+  _goQuizGame( ModelCategories modelCategories ) {
+
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) =>
-          QuizGameHome(
+          QuizGame(
             token: widget.token,
-            questionLevel: _questionLevel
+            categoryId: modelCategories.id,
           ),
       ),
     ).then(_onGoBack);
+
+    setState(() {
+      _listCategories.clear();
+    });
+
   }
 
   // forca o recarregamento ao voltar para essta tela
   FutureOr _onGoBack(dynamic value) {
-    _getUser();
+    setState(() {
+      _getUser();
+      _listCategories.clear();
+    });
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _getUser();
   }
@@ -105,83 +151,83 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     if ( _name != null ) {
       return Scaffold(
-        appBar: AppBarWidget( name: _name, photo: _photo, nextLevel: _nextLevel ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.symmetric( horizontal: 20 ),
-            child: Column(
-              children: [
-                /*
-              SizedBox(
-                height: 24,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  LevelButtonWidget(
-                    label: "Fácil",
-                  ),
-                  LevelButtonWidget(
-                    label: "Médio",
-                  ),
-                  LevelButtonWidget(
-                    label: "Difícil",
-                  ),
-                  LevelButtonWidget(
-                    label: "Fluente",
-                  ),
-                ],
-              ),
-              */
+        appBar: AppBarWidget(
+          name: _name,
+          photo: _photo,
+          nextLevel: _nextLevel,
+        ),
 
-                SizedBox(
-                  height: 24,
+        body: FutureBuilder<ModelCategories>(
+          future: _getCategories(),
+          builder: (context, snapshot) {
+            // verificar conexao
+            if ( snapshot.connectionState == ConnectionState.waiting ) {
+              return Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.darkGreen),
+                  ),
                 ),
+              );
+            } else if ( snapshot.hasError ) {
+              return Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.darkGreen),
+                  ),
+                ),
+              );
+            } else {
+              return ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount: _listCategories.length,
+                itemBuilder: ( context, index ) {
+                  ModelCategories modelCategories = _listCategories[index];
 
-                // jogar quizz
-                Padding(
-                  padding: EdgeInsets.only(top: 16, bottom: 10),
-                  child: ElevatedButton(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                  return Padding(
+                    padding: EdgeInsets.fromLTRB(16, 25, 16, 3),
+                    child: Column(
                       children: [
-                        Container(
-                          height: 40,
-                          width: 40,
-                          child: Image.asset(
-                              AppImages.blocks
+
+                        ( index == 0 )
+                        ? Padding(
+                          padding: EdgeInsets.only( bottom: 30 ),
+                          child: Text(
+                            "Escolha uma categoria de jogo",
+                            style: TextStyle(
+                              fontSize: 20,
+                            ),
                           ),
+                        )
+                        : Padding(padding: EdgeInsets.zero),
+
+                        Row(
+                          children: [
+
+                            GestureDetector(
+                              onTap: () {
+                                _goQuizGame( modelCategories );
+                              },
+                              child: Text(
+                                "${modelCategories.name}",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+
+                          ],
                         ),
 
-                        Padding(
-                          padding: EdgeInsets.only(right: 5),
-                        ),
-                        Text(
-                          "Quizz",
-                          style: TextStyle(
-                            color: Colors.deepPurple,
-                            fontSize: 20,
-                          ),
-                        ),
                       ],
                     ),
-                    style: ElevatedButton.styleFrom(
-                      primary: AppColors.levelButtonDificil,
-                      padding: EdgeInsets.fromLTRB(36, 16, 36, 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                    ),
-                    onPressed: () {
-                      _quizzGame();
-                    },
-                  ),
-                ),
-
-              ],
-            ),
-          ),
-        )
+                  );
+                }
+              );
+            }
+          },
+        ),
       );
     } else {
       return Scaffold(

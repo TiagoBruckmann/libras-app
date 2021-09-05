@@ -13,7 +13,7 @@ class ModelCategories {
   factory ModelCategories.fromJson( Map<String, dynamic> json ) {
     return ModelCategories (
       json["id"],
-      json["name"]
+      json["name"],
     );
   }
 

@@ -173,8 +173,12 @@ class _LoginState extends State<Login> {
                     decoration: InputDecoration(
                       contentPadding: EdgeInsets.fromLTRB(32, 16, 32, 16),
                       hintText: "E-mail",
+                      labelText: "E-mail",
                       filled: true,
                       fillColor: AppColors.malibu,
+                      labelStyle: TextStyle(
+                        color: Colors.black,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(5),
                       ),
@@ -189,6 +193,10 @@ class _LoginState extends State<Login> {
                   decoration: InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(36, 16, 36, 16),
                     hintText: "Senha",
+                    labelText: "Senha",
+                    labelStyle: TextStyle(
+                      color: Colors.black,
+                    ),
                     filled: true,
                     fillColor: AppColors.malibu,
                     border: OutlineInputBorder(
@@ -219,7 +227,7 @@ class _LoginState extends State<Login> {
                       ],
                     ),
                     style: ElevatedButton.styleFrom(
-                      primary: AppColors.grey,
+                      primary: AppColors.malibu,
                       padding: EdgeInsets.fromLTRB(36, 16, 36, 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(5),

@@ -46,10 +46,10 @@ class ScoreCardWidget extends StatelessWidget {
                         Text(
                           "Complete os desafios e avance em conhecimento",
                           style: AppTextStyles.body,
-                        )
+                        ),
                       ],
                     ),
-                  )
+                  ),
               ),
             ],
           ),
