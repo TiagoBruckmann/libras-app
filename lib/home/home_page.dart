@@ -16,6 +16,7 @@ import 'package:http/http.dart' as http;
 // import das telas
 import 'package:libras/home/widgets/appbar/app_bar_widget.dart';
 import 'package:libras/Games/QuizGame.dart';
+import 'package:libras/Info/InfoApp.dart';
 
 class HomePage extends StatefulWidget {
 
@@ -139,6 +140,21 @@ class _HomePageState extends State<HomePage> {
 
   }
 
+  // ir para as informações do app
+  _goInfo() {
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>
+          InfoApp(
+            token: widget.token,
+          ),
+      ),
+    );
+
+  }
+
   // ir para o quizz
   _goQuizGame( ModelCategories modelCategories ) {
 
@@ -233,14 +249,55 @@ class _HomePageState extends State<HomePage> {
                       children: [
 
                         ( index == 0 )
-                        ? Padding(
-                          padding: EdgeInsets.only( bottom: 30 ),
-                          child: Text(
-                            "Escolha uma categoria de jogo",
-                            style: TextStyle(
-                              fontSize: 20,
+                        ? Column(
+                          children: [
+
+                            Padding(
+                              padding: EdgeInsets.only(top: 16, bottom: 10),
+                              child: ElevatedButton(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.info_outline,
+                                      color: Colors.white,
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(right: 5),
+                                    ),
+                                    Text(
+                                      "Sobre o game",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  primary: AppColors.malibu,
+                                  padding: EdgeInsets.fromLTRB(36, 16, 36, 16),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  _goInfo();
+                                },
+                              ),
                             ),
-                          ),
+
+                            Padding(
+                              padding: EdgeInsets.only( bottom: 30 ),
+                              child: Text(
+                                "Escolha uma categoria de jogo",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ),
+
+                          ],
                         )
                         : Padding(padding: EdgeInsets.zero),
 
