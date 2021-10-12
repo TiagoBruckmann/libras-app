@@ -108,13 +108,13 @@ class _QuizGameState extends State<QuizGame> {
     } else if ( response.statusCode == 400 ||  response.statusCode == 401 ) {
       setState(() {
         _message = "Não foi possível buscar as perguntas, tente novamente mais tarde.";
-        _success = true;
+        _success = false;
       });
       ScaffoldMessenger.of(context).showSnackBar( _infoMessage() );
     } else if ( response.statusCode == 500 ) {
       setState(() {
-        _message = "Nossos serviços estão temporariamente indisponoveis.";
-        _success = true;
+        _message = "Nossos serviços estão temporariamente indisponíveis.";
+        _success = false;
       });
       ScaffoldMessenger.of(context).showSnackBar( _infoMessage() );
     }
@@ -247,15 +247,15 @@ class _QuizGameState extends State<QuizGame> {
 
       setState(() {
         _message = "Não foi possivel concluir a chamada de informações, por favor tente novamente.";
-        _success = true;
+        _success = false;
       });
       ScaffoldMessenger.of(context).showSnackBar( _infoMessage() );
 
     } else if ( response.statusCode == 500 ) {
 
       setState(() {
-        _message = "Nossos serviços estão temporariamente indisponoveis.";
-        _success = true;
+        _message = "Nossos serviços estão temporariamente indisponíveis.";
+        _success = false;
       });
       ScaffoldMessenger.of(context).showSnackBar( _infoMessage() );
 

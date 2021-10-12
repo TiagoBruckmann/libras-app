@@ -77,15 +77,15 @@ class _HomePageState extends State<HomePage> {
 
       setState(() {
         _message = "Não foi possivel concluir a chamada de informações, por favor tente novamente.";
-        _success = true;
+        _success = false;
       });
       ScaffoldMessenger.of(context).showSnackBar( _infoMessage() );
 
     } else if ( response.statusCode == 500 ) {
 
       setState(() {
-        _message = "Nossos serviços estão temporariamente indisponoveis.";
-        _success = true;
+        _message = "Nossos serviços estão temporariamente indisponíveis.";
+        _success = false;
       });
       ScaffoldMessenger.of(context).showSnackBar( _infoMessage() );
 
@@ -93,9 +93,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   // buscar as categorias de perguntas
-  Future<ModelCategories> _getCategories() async {
+  Future<List<ModelCategories>> _getCategories() async {
+    
     var getCategories = RoutesAPI.getCategories;
-
     var header = {
       "content-type" : "application/json",
       "Authorization": "Bearer ${widget.token}"
@@ -107,7 +107,7 @@ class _HomePageState extends State<HomePage> {
 
       var dataReturn = convert.jsonDecode(response.body);
       int totalCategories = dataReturn["total"];
-
+      
       if ( _listCategories.length < totalCategories ) {
 
         for ( var item in dataReturn["data"] ) {
@@ -118,26 +118,28 @@ class _HomePageState extends State<HomePage> {
           _listCategories.add(modelCategories);
         }
 
+        return _listCategories;
       }
 
     } else if ( response.statusCode == 400 ||  response.statusCode == 401 ) {
 
       setState(() {
         _message = "Não foi possível buscar os níveis existentes, tente novamente mais tarde.";
-        _success = true;
+        _success = false;
       });
       ScaffoldMessenger.of(context).showSnackBar( _infoMessage() );
 
     } else if ( response.statusCode == 500 ) {
 
       setState(() {
-        _message = "Nossos serviços estão temporariamente indisponoveis.";
-        _success = true;
+        _message = "Nossos serviços estão temporariamente indisponíveis.";
+        _success = false;
       });
       ScaffoldMessenger.of(context).showSnackBar( _infoMessage() );
 
     }
 
+    return _listCategories;
   }
 
   // ir para as informações do app
@@ -216,7 +218,7 @@ class _HomePageState extends State<HomePage> {
           nextLevel: _nextLevel,
         ),
 
-        body: FutureBuilder<ModelCategories>(
+        body: FutureBuilder<List<ModelCategories>>(
           future: _getCategories(),
           builder: (context, snapshot) {
             // verificar conexao

@@ -108,11 +108,12 @@ class _LoginState extends State<Login> {
 
     var _body = convert.jsonEncode(params);
     response = await http.post(login, headers: header, body: _body);
-    var token = convert.jsonDecode(response.body);
-    _token = token["token"];
-
+    print("response.statusCode => ${response.statusCode}");
     // Logando o usuario se o codigo HTTP for 200 e redirecionando para a tela Home;
     if( response.statusCode == 200 ) {
+
+      var token = convert.jsonDecode(response.body);
+      _token = token["token"];
 
       _saveCredentials();
 
@@ -132,7 +133,7 @@ class _LoginState extends State<Login> {
       });
 
     } else if ( response.statusCode == 500 ) {
-      _mensageError = "Nossos serviços estão temporariamente indisponoveis";
+      _mensageError = "Nossos serviços estão temporariamente indisponíveis";
     }
   }
 

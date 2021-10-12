@@ -6,25 +6,25 @@ var urlDefault = UrlDefault().url;
 class RoutesAPI {
 
   // auth
-  static final register = Uri.http("$urlDefault", "/api/auth/register");
-  static final login = Uri.http("$urlDefault", "/api/auth/login");
+  static final register = Uri.https("$urlDefault", "/public/api/auth/register");
+  static final login = Uri.https("$urlDefault", "/public/api/auth/login");
 
   // users
-  static final updateLevel = Uri.http("$urlDefault", "/api/v1/update-level");
-  static final verifyLogin = Uri.http("$urlDefault", "/api/v1/verify");
-  static final getUser = Uri.http("$urlDefault", "/api/v1/get-user");
+  static final updateLevel = Uri.https("$urlDefault", "/public/api/v1/update-level");
+  static final verifyLogin = Uri.https("$urlDefault", "/public/api/v1/verify");
+  static final getUser = Uri.https("$urlDefault", "/public/api/v1/get-user");
 
   // levels
-  static final getLevels = Uri.http("$urlDefault", "/api/v1/get-levels");
+  static final getLevels = Uri.https("$urlDefault", "/public/api/v1/get-levels");
 
   // categories
-  static final getCategories = Uri.http("$urlDefault", "/api/v1/get-categories");
+  static final getCategories = Uri.https("$urlDefault", "/public/api/v1/get-categories");
 
   // memory game
-  static final memoryGame = Uri.http("$urlDefault", "/api/v1/memory-game");
+  static final memoryGame = Uri.https("$urlDefault", "/public/api/v1/memory-game");
 
   // quizz game
-  static final quizzGame = Uri.http("$urlDefault", "/api/v1/quizz-game");
+  static final quizzGame = Uri.https("$urlDefault", "/public/api/v1/quizz-game");
 
 }
 
